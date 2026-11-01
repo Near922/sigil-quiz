@@ -1,53 +1,57 @@
-import { useState } from 'react';
-import { FeedbackAlert } from './components/FeedbackAlert.tsx';
-import { GameOverDialog } from './components/GameOverDialog.tsx';
-import { SigilGrid } from './components/SigilGrid.tsx';
-import { createGame, currentRound, scorePercent, selectSigil } from './game/sigilGame.ts';
+import { useEffect, useRef, useState } from 'react';
+import { QuizScreen } from './components/QuizScreen.tsx';
+import { ResultsScreen } from './components/ResultsScreen.tsx';
+import { StartScreen } from './components/StartScreen.tsx';
+import { createGame, scorePercent, selectSigil } from './game/sigilGame.ts';
 import { SIGILS } from './game/sigils.ts';
 
-type Feedback = { isCorrect: boolean } | null;
+type Phase = 'start' | 'playing' | 'results';
+
+/** How long the right/wrong highlight stays on screen before the next question. */
+const REVEAL_MS = 1200;
 
 export default function App() {
+  const [phase, setPhase] = useState<Phase>('start');
   const [game, setGame] = useState(() => createGame(SIGILS));
-  const [feedback, setFeedback] = useState<Feedback>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const timerRef = useRef<number | undefined>(undefined);
 
-  function handleSelect(sigilId: number) {
-    const result = selectSigil(game, sigilId);
-    setGame(result.state);
-    setFeedback({ isCorrect: result.isCorrect });
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
+
+  function startGame() {
+    window.clearTimeout(timerRef.current);
+    setGame(createGame(SIGILS));
+    setSelectedId(null);
+    setPhase('playing');
   }
 
-  function handlePlayAgain() {
-    setGame(createGame(SIGILS));
-    setFeedback(null);
+  function handleSelect(sigilId: number) {
+    if (selectedId !== null) return;
+    setSelectedId(sigilId);
+
+    timerRef.current = window.setTimeout(() => {
+      const { state } = selectSigil(game, sigilId);
+      setGame(state);
+      setSelectedId(null);
+      if (!state.isActive) setPhase('results');
+    }, REVEAL_MS);
   }
 
   return (
-    <main className="quiz">
-      <h1 className="title">Game of Thrones Sigil Quiz</h1>
-
-      <div className="feedback-slot">
-        {feedback && (
-          <FeedbackAlert isCorrect={feedback.isCorrect} onDismiss={() => setFeedback(null)} />
-        )}
-      </div>
-
-      <p className="question-number">
-        Question {currentRound(game)} of {game.totalRounds}
-      </p>
-      <p className="question">
-        Please choose the sigil that belongs to <strong>{game.currentSigil.house}</strong>
-      </p>
-
-      <SigilGrid choices={game.choices} onSelect={handleSelect} />
-
-      <GameOverDialog
-        open={!game.isActive}
-        score={scorePercent(game)}
-        correctAnswers={game.correctAnswers}
-        totalRounds={game.totalRounds}
-        onPlayAgain={handlePlayAgain}
-      />
+    <main className="app">
+      {phase === 'start' && <StartScreen onStart={startGame} />}
+      {phase === 'playing' && (
+        <QuizScreen game={game} selectedId={selectedId} onSelect={handleSelect} />
+      )}
+      {phase === 'results' && (
+        <ResultsScreen
+          score={scorePercent(game)}
+          correctAnswers={game.correctAnswers}
+          totalRounds={game.totalRounds}
+          onPlayAgain={startGame}
+          onHome={() => setPhase('start')}
+        />
+      )}
     </main>
   );
 }

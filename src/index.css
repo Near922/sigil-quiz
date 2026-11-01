@@ -1,0 +1,173 @@
+:root {
+  font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+  background-color: #fff;
+  --gold: #ffcc00;
+  --blue: #4baad3;
+  --blue-dark: #2980b9;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.quiz {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin: 0 0 16px;
+}
+
+.question-number,
+.question {
+  font-size: 1.5rem;
+  margin: 0 0 8px;
+}
+
+/* Reserve space so the board doesn't jump when feedback appears. */
+.feedback-slot {
+  min-height: 56px;
+  margin-bottom: 8px;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert-close {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  font-weight: bold;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.alert-close:hover {
+  opacity: 0.8;
+}
+
+.sigil-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  grid-auto-rows: 200px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.sigil-button {
+  justify-self: center;
+  align-self: center;
+  padding: 0;
+  border: 3px inset var(--gold);
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.sigil-button:hover {
+  opacity: 0.8;
+}
+
+.sigil-button:focus-visible {
+  outline: 3px solid var(--blue-dark);
+  outline-offset: 3px;
+}
+
+.sigil-button img {
+  display: block;
+  width: 87px;
+  height: 87px;
+}
+
+.game-over {
+  width: min(90vw, 480px);
+  padding: 35px 50px 40px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.game-over::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.game-over h2 {
+  margin: 0 0 24px;
+  font-weight: 400;
+}
+
+.score-line {
+  font-size: 1.5rem;
+  margin: 0 0 4px;
+}
+
+.score-high {
+  color: limegreen;
+}
+
+.score-low {
+  color: red;
+}
+
+.score-detail {
+  margin: 0 0 24px;
+  color: #777;
+}
+
+.primary-button {
+  min-width: 200px;
+  padding: 10px 0;
+  border: none;
+  color: #fff;
+  background-color: var(--blue);
+  font-size: large;
+  font-weight: 200;
+  cursor: pointer;
+}
+
+.primary-button:hover,
+.primary-button:focus-visible {
+  background-color: var(--blue-dark);
+}
+
+@media (max-width: 440px) {
+  .sigil-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 160px;
+  }
+}
